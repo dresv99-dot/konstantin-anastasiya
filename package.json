@@ -1,0 +1,9 @@
+{
+  "name": "wedding-invitation",
+  "private": true,
+  "scripts": {
+    "dev": "npx wrangler dev",
+    "test": "node scripts/check-syntax.js",
+    "build": "node scripts/check-syntax.js"
+  }
+}

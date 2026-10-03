@@ -1,0 +1,28 @@
+<!doctype html>
+<html lang="ru">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="robots" content="noindex, nofollow">
+  <title>Ответы гостей — Константин и Анастасия</title>
+  <link rel="stylesheet" href="./admin.css">
+  <script src="./api-config.js"></script>
+  <script src="./admin.js" defer></script>
+</head>
+<body>
+  <main class="admin-shell">
+    <header class="admin-header"><div><p class="eyebrow">КОНСТАНТИН И АНАСТАСИЯ · 05.01.2027</p><h1>Ответы гостей</h1></div><button id="logout" class="quiet" hidden>Выйти</button></header>
+    <form id="login-form" class="login-card">
+      <label for="password">Пароль организатора</label>
+      <input id="password" type="password" autocomplete="current-password" required>
+      <button type="submit">Войти</button>
+      <p id="login-message" role="status"></p>
+    </form>
+    <section id="dashboard" hidden>
+      <div class="stats" id="stats"></div>
+      <div class="toolbar"><input id="search" type="search" placeholder="Найти гостя"><select id="filter"><option value="all">Все ответы</option><option value="yes">Придут</option><option value="no">Не придут</option></select><button id="refresh" class="quiet">Обновить</button></div>
+      <div id="responses" class="responses"></div>
+    </section>
+  </main>
+</body>
+</html>
