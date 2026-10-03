@@ -138,10 +138,9 @@ async function telegram(request, env) {
   const chatId = String(message.chat.id);
   const menuKeyboard = {
     keyboard: [
-      [{ text: "📊 Сводка" }],
-      [{ text: "✅ Кто придет" }, { text: "🚫 Кто не придёт" }],
-      [{ text: "🥗 Питание и аллергии" }, { text: "🥂 Напитки" }],
-      [{ text: "💨Кальян" },  { text: "🔎 Найти гостя" }],
+      [{ text: "📊 Сводка" }, {text: "✅ Кто придет" }],
+      [{ text: "🥂 Напитки" }, {text: "🚫 Кто не придёт" }],
+      [{ text: "🥗 Питание и аллергии" }, { text: "💨Кальян" }],
       [{ text: "🔕 Отключить уведомления" }]
     ],
     resize_keyboard: true,
@@ -232,7 +231,7 @@ async function telegram(request, env) {
     return new Response("ok");
   }
   if (command === "/start" || command === "/help") {
-    await send("Выберите действие на клавиатуре ниже. Для поиска гостя нажмите «🔎 Найти гостя» и введите имя или фамилию.", menuKeyboard);
+    await send("Выберите действие на клавиатуре ниже., menuKeyboard);
   } else if (command === "/stats") {
     const rows = (await env.DB.prepare("SELECT attendance, companion_names, companion_types FROM rsvps").all()).results;
     const accepted = rows.filter((row) => row.attendance === "yes");
