@@ -148,11 +148,6 @@ async function telegram(request, env) {
     is_persistent: true,
     input_field_placeholder: "Выберите действие"
   };
-  const send = (text, replyMarkup) => fetch(`https://api.telegram.org/bot${env.TELEGRAM_BOT_TOKEN}/sendMessage`, {
-    method: "POST", headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ chat_id: chatId, text, parse_mode: "HTML", ...(replyMarkup ? { reply_markup: replyMarkup } : {}) })
-  });
-
   const messageText = message.text.trim();
   const [rawCommand, ...initialArgs] = messageText.split(/\s+/);
   let args = initialArgs;
@@ -167,15 +162,40 @@ async function telegram(request, env) {
     ["Кальян", "/hookah"],
     ["🔕 Отключить уведомления", "/stop"]
   ]);
+  let temporaryAction = false;
+  let relatedMessageIds = [];
+  const send = async (text, replyMarkup) => {
+    const response = await fetch(`https://api.telegram.org/bot${env.TELEGRAM_BOT_TOKEN}/sendMessage`, {
+      method: "POST", headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ chat_id: chatId, text, parse_mode: "HTML", ...(replyMarkup ? { reply_markup: replyMarkup } : {}) })
+    });
+    if (temporaryAction && response.ok) {
+      const result = await response.json();
+      const ids = [...new Set([...relatedMessageIds, result.result?.message_id].filter(Number.isInteger))];
+      const deleteAt = Math.floor(Date.now() / 1000) + 60;
+      await Promise.allSettled(ids.map((messageId) => env.DB.prepare(
+        "INSERT INTO telegram_message_cleanup (chat_id, message_id, delete_at) VALUES (?, ?, ?)"
+      ).bind(chatId, messageId, deleteAt).run()));
+    }
+    return response;
+  };
   if (buttonCommands.has(messageText)) command = buttonCommands.get(messageText);
+  if (buttonCommands.has(messageText)) {
+    temporaryAction = true;
+    relatedMessageIds = [message.message_id];
+  }
   const searchPrompt = "Введите имя или фамилию гостя.";
   if (messageText === "🔎 Найти гостя") {
+    temporaryAction = true;
+    relatedMessageIds = [message.message_id];
     await send(searchPrompt, { force_reply: true, input_field_placeholder: "Имя или фамилия" });
     return new Response("ok");
   }
   if (message.reply_to_message?.text === searchPrompt) {
     command = "/guest";
     args = [messageText];
+    temporaryAction = true;
+    relatedMessageIds = [message.message_id, message.reply_to_message.message_id];
   }
   const userId = String(message.from?.id || "");
   const inviteCode = args[0] || "";
@@ -301,5 +321,21 @@ export default {
     const responseHeaders = new Headers(response.headers);
     Object.entries(headers).forEach(([key, value]) => responseHeaders.set(key, value));
     return new Response(response.body, { status: response.status, statusText: response.statusText, headers: responseHeaders });
+  },
+
+  async scheduled(event, env) {
+    const now = Math.floor(Date.now() / 1000);
+    const due = (await env.DB.prepare("SELECT chat_id, message_id FROM telegram_message_cleanup WHERE delete_at <= ? ORDER BY delete_at LIMIT 100").bind(now).all()).results;
+    for (const item of due) {
+      try {
+        await fetch(`https://api.telegram.org/bot${env.TELEGRAM_BOT_TOKEN}/deleteMessage`, {
+          method: "POST", headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ chat_id: item.chat_id, message_id: item.message_id })
+        });
+      } finally {
+        await env.DB.prepare("DELETE FROM telegram_message_cleanup WHERE chat_id = ? AND message_id = ?")
+          .bind(item.chat_id, item.message_id).run();
+      }
+    }
   }
 };
