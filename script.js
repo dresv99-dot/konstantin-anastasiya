@@ -8,6 +8,8 @@ const companionList = document.querySelector("#companion-list");
 const alcoholOtherToggle = document.querySelector("#alcohol-other-toggle");
 const alcoholOtherRow = document.querySelector("#alcohol-other-row");
 const alcoholOtherField = document.querySelector("#alcohol-other");
+const dietDetailsRow = document.querySelector("#diet-details-row");
+const dietField = document.querySelector("#diet");
 const submittedMessage = "Спасибо! Ваши ответы отправлены организаторам.";
 const submittedStorageKey = "wedding-rsvp-submitted-v1";
 const submittedCookieName = "wedding-rsvp-submitted";
@@ -105,6 +107,13 @@ const updateCompanionFields = () => {
 };
 
 form.addEventListener("change", (event) => {
+  if (event.target.name === "dietStatus") {
+    const hasDietDetails = event.target.value === "yes";
+    dietDetailsRow.hidden = !hasDietDetails;
+    dietField.disabled = !hasDietDetails;
+    if (!hasDietDetails) dietField.value = "";
+  }
+
   if (event.target.name === "attendance") {
     const attending = event.target.value === "yes";
     guestQuestionnaire.hidden = !attending;
@@ -122,6 +131,12 @@ form.addEventListener("change", (event) => {
     if (!alcoholOtherToggle.checked) alcoholOtherField.value = "";
   }
 });
+
+const selectedDietStatus = form.querySelector('input[name="dietStatus"]:checked');
+if (selectedDietStatus) {
+  dietDetailsRow.hidden = selectedDietStatus.value !== "yes";
+  dietField.disabled = selectedDietStatus.value !== "yes";
+}
 
 form.addEventListener("submit", async (event) => {
   event.preventDefault();
