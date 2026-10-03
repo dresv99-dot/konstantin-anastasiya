@@ -1,0 +1,10 @@
+CREATE TABLE IF NOT EXISTS telegram_organizers (
+  user_id TEXT PRIMARY KEY,
+  chat_id TEXT NOT NULL,
+  username TEXT NOT NULL DEFAULT '',
+  first_name TEXT NOT NULL DEFAULT '',
+  last_name TEXT NOT NULL DEFAULT '',
+  is_active INTEGER NOT NULL DEFAULT 1 CHECK (is_active IN (0, 1)),
+  created_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  updated_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP
+);
