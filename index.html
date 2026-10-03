@@ -114,10 +114,25 @@
           <div class="companion-list" id="companion-list" hidden></div>
         </div>
 
-        <div class="form-row">
-          <label class="form-label" for="diet">Есть ли особенности питания или аллергии?</label>
-          <textarea class="field-textarea" id="diet" name="diet" rows="1"></textarea>
-        </div>
+        <fieldset>
+          <legend>Есть ли особенности питания или аллергии?</legend>
+          <div class="choice-list">
+            <label class="choice"><input type="radio" name="dietStatus" value="yes"><span>Да</span></label>
+            <label class="choice"><input type="radio" name="dietStatus" value="no" checked><span>Нет</span></label>
+          </div>
+          <div class="form-row" id="diet-details-row" hidden>
+            <label class="form-label" for="diet">Напишите, пожалуйста</label>
+            <textarea class="field-textarea" id="diet" name="diet" rows="1" disabled></textarea>
+          </div>
+        </fieldset>
+
+        <fieldset>
+          <legend>Курите ли вы кальян?</legend>
+          <div class="choice-list">
+            <label class="choice"><input type="radio" name="hookah" value="yes" required><span>Да</span></label>
+            <label class="choice"><input type="radio" name="hookah" value="no" required><span>Нет</span></label>
+          </div>
+        </fieldset>
 
         <fieldset>
           <legend>Какой алкоголь предпочитаете?</legend>
