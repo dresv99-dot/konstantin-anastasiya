@@ -8,5 +8,8 @@ database_name = "listofguests"
 database_id = "5cb031cb-8469-4c27-a46d-fe19e999570b"
 migrations_dir = "migrations"
 
+[triggers]
+crons = ["* * * * *"]
+
 [vars]
 ALLOWED_ORIGIN = "https://konstantin-anastasiya.ru"
