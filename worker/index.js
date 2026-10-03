@@ -231,7 +231,7 @@ async function telegram(request, env) {
     return new Response("ok");
   }
   if (command === "/start" || command === "/help") {
-    await send("Выберите действие на клавиатуре ниже., menuKeyboard);
+    await send("Выберите действие на клавиатуре ниже.", menuKeyboard);
   } else if (command === "/stats") {
     const rows = (await env.DB.prepare("SELECT attendance, companion_names, companion_types FROM rsvps").all()).results;
     const accepted = rows.filter((row) => row.attendance === "yes");
