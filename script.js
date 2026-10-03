@@ -9,6 +9,7 @@ const alcoholOtherToggle = document.querySelector("#alcohol-other-toggle");
 const alcoholOtherRow = document.querySelector("#alcohol-other-row");
 const alcoholOtherField = document.querySelector("#alcohol-other");
 const submittedMessage = "Спасибо! Ваши ответы отправлены организаторам.";
+const submittedStorageKey = "wedding-rsvp-submitted-v1";
 
 const revealTargets = document.querySelectorAll(
   ".welcome, .location-layout, .schedule-list, .dresscode, .details, .rsvp-intro, .rsvp-form, .footer"
@@ -36,7 +37,11 @@ const lockForm = () => {
   formMessage.textContent = submittedMessage;
 };
 
-// Разрешаем гостю изменить и отправить ответы повторно с этого устройства.
+try {
+  if (localStorage.getItem(submittedStorageKey) === "true") lockForm();
+} catch {
+  // Если хранилище браузера недоступно, форма остаётся доступной.
+}
 
 const updateCompanionFields = () => {
   const count = Number(companionCount.value);
@@ -117,6 +122,11 @@ form.addEventListener("submit", async (event) => {
       body: JSON.stringify(payload)
     });
     if (!response.ok) throw new Error("Не удалось отправить ответы.");
+    try {
+      localStorage.setItem(submittedStorageKey, "true");
+    } catch {
+      // Отправленная анкета всё равно блокируется до перезагрузки страницы.
+    }
     lockForm();
   } catch {
     button.disabled = false;
