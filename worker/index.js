@@ -138,10 +138,10 @@ async function telegram(request, env) {
   const chatId = String(message.chat.id);
   const menuKeyboard = {
     keyboard: [
-      [{ text: "📊 Сводка" }, { text: "✅ Кто придет" }],
-      [{ text: "🚫 Кто не придёт" }, { text: "🥗 Питание и аллергии" }],
-      [{ text: "🥂 Напитки" }, { text: "🔎 Найти гостя" }],
-      [{ text: "Кальян" }],
+      [{ text: "📊 Сводка" }],
+      [{ text: "✅ Кто придет" }, { text: "🚫 Кто не придёт" }],
+      [{ text: "🥗 Питание и аллергии" }, { text: "🥂 Напитки" }],
+      [{ text: "💨Кальян" },  { text: "🔎 Найти гостя" }],
       [{ text: "🔕 Отключить уведомления" }]
     ],
     resize_keyboard: true,
@@ -159,7 +159,7 @@ async function telegram(request, env) {
     ["🚫 Кто не придёт", "/no"],
     ["🥗 Питание и аллергии", "/allergies"],
     ["🥂 Напитки", "/drinks"],
-    ["Кальян", "/hookah"],
+    ["💨Кальян", "/hookah"],
     ["🔕 Отключить уведомления", "/stop"]
   ]);
   let temporaryAction = false;
