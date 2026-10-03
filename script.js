@@ -10,6 +10,7 @@ const alcoholOtherRow = document.querySelector("#alcohol-other-row");
 const alcoholOtherField = document.querySelector("#alcohol-other");
 const submittedMessage = "Спасибо! Ваши ответы отправлены организаторам.";
 const submittedStorageKey = "wedding-rsvp-submitted-v1";
+const submittedCookieName = "wedding-rsvp-submitted";
 
 const revealTargets = document.querySelectorAll(
   ".welcome, .location-layout, .schedule-list, .dresscode, .details, .rsvp-intro, .rsvp-form, .footer"
@@ -37,8 +38,29 @@ const lockForm = () => {
   formMessage.textContent = submittedMessage;
 };
 
+const hasSubmitted = () => {
+  try {
+    if (localStorage.getItem(submittedStorageKey) === "true") return true;
+  } catch {
+    // Проверяем cookie, если хранилище браузера недоступно.
+  }
+  return document.cookie.split(";").some((cookie) => cookie.trim() === `${submittedCookieName}=true`);
+};
+
+const saveSubmitted = () => {
+  try {
+    localStorage.setItem(submittedStorageKey, "true");
+  } catch {
+    // Cookie ниже сохраняет отметку, если хранилище браузера недоступно.
+  }
+  document.cookie = `${submittedCookieName}=true; Max-Age=31536000; Path=/; Domain=konstantin-anastasiya.ru; SameSite=Lax`;
+};
+
 try {
-  if (localStorage.getItem(submittedStorageKey) === "true") lockForm();
+  if (hasSubmitted()) {
+    saveSubmitted();
+    lockForm();
+  }
 } catch {
   // Если хранилище браузера недоступно, форма остаётся доступной.
 }
@@ -122,11 +144,7 @@ form.addEventListener("submit", async (event) => {
       body: JSON.stringify(payload)
     });
     if (!response.ok) throw new Error("Не удалось отправить ответы.");
-    try {
-      localStorage.setItem(submittedStorageKey, "true");
-    } catch {
-      // Отправленная анкета всё равно блокируется до перезагрузки страницы.
-    }
+    saveSubmitted();
     lockForm();
   } catch {
     button.disabled = false;
